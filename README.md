@@ -7,8 +7,11 @@ Please contact john.prince@eng.ox.ac.uk for any questions regarding the code or 
 
 Code Includes:
 
-main.py
-modelDefintions.py
-usefulMethods.py
+1) main.py
+
+2) modelDefintions.py
+
+3) usefulMethods.py
+
 
 UPDATE: Code is currently being formatted into publishable form and will be uploaded soon.
