@@ -12,6 +12,3 @@ Code Includes:
 2) modelDefintions.py
 
 3) usefulMethods.py
-
-
-UPDATE: Code is currently being formatted into publishable form and will be uploaded soon.
