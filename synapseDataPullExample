@@ -1,0 +1,120 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Nov  1 16:40:06 2016
+@author: johnPrince
+"""
+import synapseclient
+import json
+import os
+from pprint import pprint
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import signal
+
+"""
+This is example code of how to pull data from Synapse to local machine
+Here it is implemented for the tapping acceleration data in the mPower study
+Please pay careful attention to the directory notes, these will be where the raw data files are saved and are ordered by patient ID followed by recordID
+"""
+
+username = ''
+password = ''
+
+syn = synapseclient.Synapse()
+syn.login(username, password)
+
+# ###############################################################################
+# DOWNLOAD
+
+# Lets get the tapping data
+# Select the rows
+tapping = syn.tableQuery("SELECT * FROM syn5511439 ORDER BY healthCode ASC offset 0")
+# Specify the Column
+# file_map = syn.downloadTableColumns(tapping, ['tapping_results.json.TappingSamples'])  # Tapping Samples
+file_map = syn.downloadTableColumns(tapping, ['accel_tapping.json.items'])               # Tapping Accelerations
+
+############################################################################################
+# LABELS
+
+# Lets find the healthCodes so label can be found in demographics survey
+rowset = syn.tableQuery("SELECT * FROM syn5511439 ORDER BY healthCode ASC offset 0")  #78878
+tableMass = rowset.asDataFrame()
+hC = tableMass['healthCode']
+recID = tableMass['recordId']
+
+directoryOne = '/healthCodesTappingRecID.csv' # Add your directory keeping this filename at the end
+
+tableMass.to_csv(directoryOne)
+
+# just selected the first one here for sanity
+healthCode = str(hC.ix[0, 0])
+print(healthCode)
+
+rowset = syn.tableQuery("SELECT * FROM syn5511429 ORDER BY healthCode ASC", resultsAs='rowset')
+tableMass = rowset.asDataFrame()
+
+directoryTwo = '/Demographics_SurveyTappingRecID.csv' # Add your directory keeping this filename at the end
+
+tableMass.to_csv(directoryTwo)
+
+# Lets get the Diagnosis
+query = "SELECT * FROM syn5511429 WHERE healthCode = '{}' ".format(healthCode)
+demo = syn.tableQuery(query, resultsAs='rowset')
+df_demo = demo.asDataFrame()
+# Our label!
+df_demo['professional-diagnosis']
+
+#############################################################################
+
+# THIS IS FOR DEVICEMOTION_WALKING_OUTBOUND DATA PULLING
+cachef = file_map.values()
+
+# lets open the first one
+count = 1
+fileCount = 1;
+for x in range(0, 78878):  #(0, 78878)
+    with open(list(cachef)[x]) as f:
+        data = json.load(f)
+    # turn that dict into a dataframe
+    from pandas.io.json import json_normalize
+
+    df_data = json_normalize(data)
+    healthCode = str(hC.ix[x, 0])
+    recordID = str(recID.ix[x, 0])
+    print('Downloading file . . . ' + str(fileCount) + ' ' + healthCode)
+    fileCount = fileCount + 1;
+    
+    baseDir = '/' # Set the directory where you would like ALL the raw data to be saved 
+    IMPORTANT: Make sure the / stays at the end of the directory!!!
+    
+    
+    directory = baseDir + healthCode
+    directory2 = 'C:/Users/wolf4510/Documents/001mPowerDownloads/recordIDTappingAccel/' + healthCode + '/accel_results'
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        # count = 1
+    else:
+        John = 1
+        # count = len([G for G in os.listdir(directory)
+        #   if os.path.isfile(os.path.join(directory, G))])+1
+
+    if not os.path.exists(directory2):
+        os.makedirs(directory2)
+        count = 1
+        B = str(count)
+        print('The If Count is ' + B)
+
+        df_data.to_csv(baseDir + healthCode + '/accel_results/' + recordID + '.csv')
+    else:
+        count = count + 1
+        B = str(count)
+        print('The Else Count is ' + B)
+
+        df_data.to_csv(baseDir + healthCode + '/accel_results/' + recordID + '.csv')
+
+
+
+
