@@ -91,7 +91,7 @@ for x in range(0, 78878):  #(0, 78878)
     
     
     directory = baseDir + healthCode
-    directory2 = 'C:/Users/wolf4510/Documents/001mPowerDownloads/recordIDTappingAccel/' + healthCode + '/accel_results'
+    directory2 = baseDir + healthCode + '/accel_results'
 
     if not os.path.exists(directory):
         os.makedirs(directory)
