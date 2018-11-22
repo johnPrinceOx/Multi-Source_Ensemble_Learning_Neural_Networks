@@ -86,8 +86,10 @@ for x in range(0, 78878):  #(0, 78878)
     print('Downloading file . . . ' + str(fileCount) + ' ' + healthCode)
     fileCount = fileCount + 1;
     
-    baseDir = '/' # Set the directory where you would like ALL the raw data to be saved 
-    IMPORTANT: Make sure the / stays at the end of the directory!!!
+    
+    # Set the directory where you would like ALL the raw data to be saved 
+    # IMPORTANT: Make sure the / stays at the end of the directory!!!
+    baseDir = '/'
     
     
     directory = baseDir + healthCode
